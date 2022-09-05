@@ -6,18 +6,13 @@ var target      = Argument("target", "Default");
 
 var taskCount   = 0;
 var taskCounter = 0;
-
-void LogInformation(string format, params object[] args)
-{
-   NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
-   log.Info(string.Format(format, args));
-   Information(format, args);
-}
+var taskName = "";
 
 TaskSetup((taskSetupContext) => {
    ICakeTaskInfo task = taskSetupContext.Task;
    var dependencies = string.Join(",",task.Dependencies.Select(dependecy => dependecy.Name).ToList());
    dependencies = dependencies.Replace(",","").Trim() == "" ? "none" : dependencies;
+   taskName = task.Name;
    LogInformation("Executing Task {0} of {1}", ++taskCounter, taskCount);
    LogInformation("Name: {0}", task.Name);
    LogInformation("Description: {0}", task.Description ?? "none");
@@ -50,11 +45,11 @@ Setup(context => {
    taskCount = countTask(target, new List<string>());
 
    // Executed BEFORE the first task.
-   Information("Running tasks...");
+   LogSetupInformation("Running tasks...");
 });
 
 Teardown(ctx =>
 {
    // Executed AFTER the last task.
-   Information("Finished running tasks.");
+   LogSetupInformation("Finished running tasks.");
 });

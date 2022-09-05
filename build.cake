@@ -15,7 +15,7 @@ Task("Default")
    .Does(() =>
    {
       #break
-      Information("Task completed successfully");
+      LogInformation("Task completed successfully");
    });
 
 RunTarget(target);

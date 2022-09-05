@@ -9,7 +9,7 @@ Task("task1")
    .Does(() =>
    {
       #break
-      Information("Task completed successfully");
+      LogInformation("Task completed successfully");
    });
 
 Task("task2")
@@ -17,7 +17,7 @@ Task("task2")
    .Does(() =>
    {
       #break
-      Information("Task completed successfully");
+      LogInformation("Task completed successfully");
    });
 
 Task("tasks")
@@ -27,7 +27,7 @@ Task("tasks")
    .Does(() =>
    {
       #break
-      Information("Task completed successfully");
+      LogInformation("Task completed successfully");
    });
 
 #if (DEBUG)
@@ -39,7 +39,7 @@ Task("Default")
    .Does(() =>
    {
       #break
-      Information("Task completed successfully");
+      LogInformation("Task completed successfully");
    });
 
 RunTarget(target);

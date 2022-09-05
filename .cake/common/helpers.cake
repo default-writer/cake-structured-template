@@ -39,9 +39,23 @@ void RunExternalTask(params string[] list)
    RunExternalTaskAt(new List<string>(list));
 }
 
+void LogInformation(string format, params object[] args)
+{
+   NLog.Logger log = NLog.LogManager.GetLogger(taskName);
+   log.Info(format, args);
+   Information(format, args);
+}
+
+void LogSetupInformation(string format, params object[] args)
+{
+   NLog.Logger log = NLog.LogManager.GetLogger("SYSTEM");
+   log.Info(format, args);
+   Information(format, args);
+}
+
 void RunExternalTaskAt(List<string> list, DirectoryPath workingDirectory=null)
 {
-   NLog.Logger log = NLog.LogManager.GetCurrentClassLogger();
+   NLog.Logger log = NLog.LogManager.GetLogger(taskName);
 
    var command = list.First();
    var builder = new ProcessArgumentBuilder();
@@ -56,11 +70,11 @@ void RunExternalTaskAt(List<string> list, DirectoryPath workingDirectory=null)
       settings.WorkingDirectory = workingDirectory;
    }
    var commandArgs = string.Join(" ", builder);
-   Information("");
-   Information("========================================");
-   Information($"\"{command}\" {commandArgs}");
-   Information("========================================");
-   Information("");
+   LogInformation("");
+   LogInformation("========================================");
+   LogInformation($"\"{command}\" {commandArgs}");
+   LogInformation("========================================");
+   LogInformation("");
 
    settings.RedirectStandardOutput = true;
    settings.RedirectStandardError = true;
@@ -69,7 +83,7 @@ void RunExternalTaskAt(List<string> list, DirectoryPath workingDirectory=null)
       if (s != null)
       {
          log.Info(s);
-         Information(s);
+         LogInformation(s);
       }
       return s;
    };
@@ -78,7 +92,7 @@ void RunExternalTaskAt(List<string> list, DirectoryPath workingDirectory=null)
       if (s != null)
       {
          log.Info(s);
-         Information(s);
+         LogInformation(s);
       }
       return s;
    };
@@ -86,7 +100,7 @@ void RunExternalTaskAt(List<string> list, DirectoryPath workingDirectory=null)
    using(var process = StartAndReturnProcess(command, settings))
    {
       process.WaitForExit();
-      Information("");
+      LogInformation("");
       if (process.GetExitCode() != 0)
       {
          throw new Exception("Task execution failed");
@@ -128,7 +142,6 @@ string GetRootDirectory()
    }
    return result.ToString();
 }
-
 
 void SetupNLogLogging()
 {
