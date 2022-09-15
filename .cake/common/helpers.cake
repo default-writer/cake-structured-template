@@ -34,6 +34,62 @@ void RunExternalTasks(params Task[] list)
    }
 }
 
+void RunUnloggedExternalTask(params string[] list)
+{
+   RunUnloggedExternalTaskAt(new List<string>(list), GetRootDirectory());
+}
+
+void RunUnloggedExternalTaskAt(List<string> list, DirectoryPath workingDirectory=null)
+{
+   var command = list.First();
+   var builder = new ProcessArgumentBuilder();
+   foreach(var arg in list.Skip(1))
+   {
+      builder.Append(arg);
+   }
+
+   var settings = new ProcessSettings() { Arguments = builder };
+   if (workingDirectory != null)
+   {
+      settings.WorkingDirectory = workingDirectory;
+   }
+   var commandArgs = string.Join(" ", builder);
+   Information("");
+   Information("========================================");
+   Information($"{command} {commandArgs}");
+   Information("========================================");
+   Information("");
+
+   settings.RedirectStandardOutput = true;
+   settings.RedirectStandardError = true;
+   settings.RedirectedStandardOutputHandler = (s) =>
+   {
+      if (s != null)
+      {
+         Information(s);
+      }
+      return s;
+   };
+   settings.RedirectedStandardErrorHandler = (s) =>
+   {
+      if (s != null)
+      {
+         Information(s);
+      }
+      return s;
+   };
+
+   using(var process = StartAndReturnProcess(command, settings))
+   {
+      process.WaitForExit();
+      Information("");
+      if (process.GetExitCode() != 0)
+      {
+         throw new Exception("Task execution failed");
+      }
+   }
+}
+
 void RunExternalTask(params string[] list)
 {
    RunExternalTaskAt(new List<string>(list));
@@ -72,7 +128,7 @@ void RunExternalTaskAt(List<string> list, DirectoryPath workingDirectory=null)
    var commandArgs = string.Join(" ", builder);
    LogInformation("");
    LogInformation("========================================");
-   LogInformation($"\"{command}\" {commandArgs}");
+   LogInformation($"{command} {commandArgs}");
    LogInformation("========================================");
    LogInformation("");
 

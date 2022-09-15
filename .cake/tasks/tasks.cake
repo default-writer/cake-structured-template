@@ -4,9 +4,9 @@
 
 #load "../../.cake/common/common.cake"
 
-Task("reset").Does(() => RunExternalTask("git", "reset", "HEAD", "--hard"));
+Task("reset").Does(() => RunUnloggedExternalTask("git", "reset", "HEAD", "--hard"));
 
-Task("cleanup").Does(() => RunExternalTask("git", "clean", "-f", "-d", "-x", "-e .logs", "-e .tools", "-e .dotnet"));
+Task("cleanup").Does(() => RunUnloggedExternalTask("git", "clean", "-f", "-d", "-x", "-e", ".logs", "-e", ".tools", "-e", ".dotnet"));
 
 #if (DEBUG)
 #else
